@@ -3,9 +3,8 @@ const env = require("../configs");
 
 const startDatabase = async () => {
   try {
-    await mongoose.connect(`mongodb+srv://taapn:taapn@cluster0.baq8l.mongodb.net/test
-
-    `, {
+    await mongoose.connect(`mongodb+srv://taapn:taapn@cluster0.baq8l.mongodb.net/test`,
+     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
