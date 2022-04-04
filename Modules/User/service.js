@@ -493,7 +493,7 @@ exports.getStatistics = async(userId) => {
             }
           }, {
             '$sort': {
-              '_date': 1
+              'date': -1
             }
           }, {
             '$group': {
@@ -542,7 +542,7 @@ exports.getStatistics = async(userId) => {
             }
           }, {
             '$sort': {
-              '_date': 1
+              'date': -1
             }
           }, {
             '$group': {
