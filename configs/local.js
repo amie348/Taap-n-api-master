@@ -1,4 +1,4 @@
-module.exports.PORT = process.env.port || 3001;
+module.exports.PORT = 3000;
 module.exports.API_BASE_URL = 'http://localhost:3001/';
 module.exports.CLIENT_URL = 'http://localhost:3000/';
 module.exports.DB_URI = 'mongodb://localhost/TanpN';
