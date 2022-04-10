@@ -108,6 +108,10 @@ const userSchema = mongoose.Schema({
       }
     }
   ],
+  role:{
+    type: mongoose.Types.ObjectId,
+    ref: 'roles'
+  },
   resetCode: {
     type: Number,
     default: null,
@@ -134,6 +138,10 @@ const userSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  status: {
+    type: String,
+    default : 'active'
+  }
 });
 
 /*const validateUserSchema = (user) => {

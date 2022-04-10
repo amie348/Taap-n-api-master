@@ -72,6 +72,8 @@ const {
   userContent,
 
   getStatistics,
+  holdUserAccount,
+  activateUserAccount,
 
   addUserFavorite,
   removeUserFavorite,
@@ -1005,16 +1007,16 @@ exports.deleteUserService = async (request, reply) => {
   }
 };
 
+
+/***************************************************** */ 
 exports.getDashticks = async(request, reply) => {
 
-  const { userId } = request;
-
-  // console.log(request)
+  const { user } = request;
 
   try{
 
 
-    const statistics = await getStatistics(userId);
+    const statistics = await getStatistics(user._id);
 
     return reply.status(200).send({
 
@@ -1032,5 +1034,93 @@ exports.getDashticks = async(request, reply) => {
 
 
 
+
+}
+
+exports.holdAccount = async(request, reply) => {
+
+  const { id } = request.params;
+
+  try{
+
+    const result = await holdUserAccount(id);
+
+    if(!result){
+
+      console.log('User Do Not Exist')
+
+      reply.status(404).send({
+
+        message: 'User do not exist'
+
+      })
+
+    }
+
+    reply.status(200).send({
+
+      message: 'Request Successfully completed',
+      payload: result
+      
+    })
+
+
+  } catch(error){
+
+    console.log('error', error)
+
+    reply.status(500).send({
+
+      message: 'Internal servr error occured',
+      error: error.message
+
+      
+    })
+
+  }
+
+}
+
+exports.activateAccount = async(request, reply) => {
+
+  const { id } = request.params;
+
+  try{
+
+    const result = await activateUserAccount(id);
+
+    if(!result){
+
+      console.log('User Do Not Exist')
+
+      reply.status(404).send({
+
+        message: 'User do not exist'
+
+      })
+
+    }
+
+    reply.status(200).send({
+
+      message: 'Request Successfully completed',
+      payload: result
+      
+    })
+
+
+  } catch(error){
+
+    console.log('error', error)
+
+    reply.status(500).send({
+
+      message: 'Internal servr error occured',
+      error: error.message
+
+      
+    })
+
+  }
 
 }

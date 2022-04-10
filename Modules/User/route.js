@@ -1,5 +1,5 @@
 const { uploadPicture } = require('../../uploadContent/multer');
-const {auth} = require(`../../middleware/auth`);
+const {auth, isAdmin} = require(`../../middleware/auth`);
 const {
   signup,
   login,
@@ -41,6 +41,8 @@ const {
 
   // getting statistics for dashboard
   getDashticks,
+  holdAccount,
+  activateAccount,
 
   handleSubscribeUser,
 } = require('./controller');
@@ -50,7 +52,7 @@ async function routes(fastify) {
   fastify.post('/login', login);
   fastify.get('/', getAllUsers);
   fastify.get('/:id', getUserById);
-  fastify.delete('/:id', deleteUser);
+  fastify.delete('/:id', { preHandler :[auth, isAdmin]}, deleteUser);
 
   // reset Password Process
   fastify.put('/forget-password', sendCodeToEmail);
@@ -63,6 +65,17 @@ async function routes(fastify) {
     { preHandler: uploadPicture },
     updateUserProfilePicture
   );
+
+  fastify.put(
+    '/hold-account/:id',
+    {preHandler: [auth, isAdmin]},
+    holdAccount);
+
+    fastify.put(
+      '/activate-account/:id',
+      {preHandler: [auth, isAdmin]},
+      activateAccount);
+
 
   fastify.get('/wallet/:id', getUserWallet);
   fastify.post('/wallet/:id', updateUserWallet);

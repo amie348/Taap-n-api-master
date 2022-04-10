@@ -64,6 +64,12 @@ exports.allUsers = async () => {
 exports.getUser = async (id) => {
   return await UserModal.findOne({_id: id}, {subscribeHistory: false})
     .populate({
+      path:'role',
+       select: {
+         role:1
+        }
+      })
+    .populate({
       path: 'review',
       select: {
         reviewFor: 0,
@@ -452,122 +458,129 @@ exports.handleSubscribe = async (subscribeById, subscribeToId) => {
 };
 
 exports.getStatistics = async(userId) => {
-
-  console.log(userId);
-  
+    
   const pipeline = [
-    {
-      '$facet': {
-        'gainedSubscribers': [
-          {
-            '$match': {
-              '_id': mongoose.Types.ObjectId(userId)
-            }
-          }, {
-            '$project': {
-              'subscribeHistory': 1
-            }
-          }, {
-            '$unwind': {
-              'path': '$subscribeHistory'
-            }
-          }, {
-            '$match': {
-              'subscribeHistory.status': 'subscribed'
-            }
-          }, {
-            '$group': {
-              '_id': {
-                '_id': '$_id', 
-                'date': '$subscribeHistory.date'
-              }, 
-              'total': {
-                '$sum': 1
-              }
-            }
-          }, {
-            '$project': {
-              '_id': '$_id._id', 
-              'date': '$_id.date', 
+  {
+  '$facet': {
+    'gainedSubscribers': [
+      {
+        '$match': {
+          '_id': mongoose.Types.ObjectId(userId)
+        }
+      }, {
+        '$project': {
+          'subscribeHistory': 1
+        }
+      }, {
+        '$unwind': {
+          'path': '$subscribeHistory'
+        }
+      }, {
+        '$match': {
+          'subscribeHistory.status': 'subscribed'
+        }
+      }, {
+        '$group': {
+          '_id': {
+            '_id': '$_id', 
+            'date': '$subscribeHistory.date'
+          }, 
+          'total': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$project': {
+          '_id': '$_id._id', 
+          'date': '$_id.date', 
+          'total': '$total'
+        }
+      }, {
+        '$sort': {
+          'date': 1
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'gainedSubscribers': {
+            '$push': {
+              'date': '$date', 
               'total': '$total'
             }
-          }, {
-            '$sort': {
-              'date': 1
-            }
-          }, {
-            '$group': {
-              '_id': '$_id', 
-              'gainedSubscribers': {
-                '$push': {
-                  'date': '$date', 
-                  'total': '$total'
-                }
-              }
-            }
           }
-        ], 
-        'lostSubscribers': [
-          {
-            '$match': {
-              '_id': mongoose.Types.ObjectId(userId)
-            }
-          }, {
-            '$project': {
-              'subscribeHistory': 1
-            }
-          }, {
-            '$unwind': {
-              'path': '$subscribeHistory'
-            }
-          }, {
-            '$match': {
-              'subscribeHistory.status': 'unsubscribed'
-            }
-          }, {
-            '$group': {
-              '_id': {
-                '_id': '$_id', 
-                'date': '$subscribeHistory.date'
-              }, 
-              'total': {
-                '$sum': 1
-              }
-            }
-          }, {
-            '$project': {
-              '_id': '$_id._id', 
-              'date': '$_id.date', 
-              'total': '$total'
-            }
-          }, {
-            '$sort': {
-              'date': 1
-            }
-          }, {
-            '$group': {
-              '_id': '$_id', 
-              'lostSubscribers': {
-                '$push': {
-                  'date': '$date', 
-                  'total': '$total'
-                }
-              }
-            }
-          }
-        ]
+        }
       }
-    }
+    ], 
+    'lostSubscribers': [
+      {
+        '$match': {
+          '_id': mongoose.Types.ObjectId(userId)
+        }
+      }, {
+        '$project': {
+          'subscribeHistory': 1
+        }
+      }, {
+        '$unwind': {
+          'path': '$subscribeHistory'
+        }
+      }, {
+        '$match': {
+          'subscribeHistory.status': 'unsubscribed'
+        }
+      }, {
+        '$group': {
+          '_id': {
+            '_id': '$_id', 
+            'date': '$subscribeHistory.date'
+          }, 
+          'total': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$project': {
+          '_id': '$_id._id', 
+          'date': '$_id.date', 
+          'total': '$total'
+        }
+      }, {
+        '$sort': {
+          'date': 1
+        }
+      }, {
+        '$group': {
+          '_id': '$_id', 
+          'lostSubscribers': {
+            '$push': {
+              'date': '$date', 
+              'total': '$total'
+            }
+          }
+        }
+      }
+    ]
+  }
+  }
   ]
 
   const result =  ( await UserModal.aggregate(pipeline))[0];
 
-  console.log(result)
-
   return result;
+  
+}
+
+exports.holdUserAccount = async(id) => {
+
+  return await UserModal.findByIdAndUpdate({ _id: id}, { status: 'hold' }, {new: true})
 
 }
 
+exports.activateUserAccount = async(id) => {
+
+  return await UserModal.findByIdAndUpdate({ _id: id}, { status: 'active' }, {new: true})
+
+}
 
 /************************************************************* */
 // User Feed
