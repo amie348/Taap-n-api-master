@@ -1013,10 +1013,12 @@ exports.getDashticks = async(request, reply) => {
 
   const { user } = request;
 
+  console.log(user)
+
   try{
 
-
-    const statistics = await getStatistics(user._id);
+    console.log("-----------------------")
+    const statistics = await getStatistics(user.id);
 
     return reply.status(200).send({
 

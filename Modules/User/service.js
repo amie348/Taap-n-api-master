@@ -459,6 +459,8 @@ exports.handleSubscribe = async (subscribeById, subscribeToId) => {
 
 exports.getStatistics = async(userId) => {
     
+  console.log('userId------------------',userId)
+
   const pipeline = [
   {
   '$facet': {

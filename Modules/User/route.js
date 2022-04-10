@@ -105,7 +105,7 @@ async function routes(fastify) {
   //fastify.get('/ticket/user-tickets/:id', myCreatedTickets);
 
   // statistics for dashboard
-  fastify.get('/dashtics', {preHandler: auth}, getDashticks);
+  fastify.get('/dashtics', {preHandler: [auth]}, getDashticks);
 
 }
 
