@@ -584,6 +584,80 @@ exports.activateUserAccount = async(id) => {
 
 }
 
+exports.getPaginatedUsers = async(startRecord, noOfRecords, filters) =>{
+
+    // crteating projection object 
+    let pipeline = [
+      {
+
+        '$match': filters
+      
+      }, {
+
+        $facet : {
+          possibleDataDrawings: [
+            {
+              $count: `total`
+            },
+            {
+              $project: {
+                possibleDataDrawings: {
+                  $ceil: {
+                    $divide: [`$total`, noOfRecords]
+                  }
+                }
+              }
+            }
+          ],
+          users: [
+            
+            {
+      
+              '$skip': startRecord
+            
+            }, {
+              
+              '$limit': noOfRecords
+              
+            }, {
+
+              '$project': {
+          
+                'firstName': 1,
+                'lastName': 1,
+                'email': 1,
+                'address': 1,
+                'companyName': 1,
+                'status': 1,
+                '_id': 1
+          
+            }
+          
+          }
+          ]
+        }
+      }, {
+        $project: {
+          possibleDataDrawings: {
+            $arrayElemAt: [`$possibleDataDrawings`, 0]
+          },
+          users: 1
+        }
+      }, {
+        $project: {
+          possibleDataDrawings: `$possibleDataDrawings.possibleDataDrawings`,
+          users: 1
+        }
+      }
+      ]
+
+    // querying database for all franchises
+    let {possibleDataDrawings ,users}  = (await UserModal.aggregate(pipeline).exec())[0];
+    
+    return {possibleDataDrawings, users}
+
+}
+
 /************************************************************* */
 // User Feed
 //Get user Feed

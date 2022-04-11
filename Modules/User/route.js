@@ -43,6 +43,7 @@ const {
   getDashticks,
   holdAccount,
   activateAccount,
+  paginatedUsers,
 
   handleSubscribeUser,
 } = require('./controller');
@@ -51,6 +52,7 @@ async function routes(fastify) {
   fastify.post('/signup', signup);
   fastify.post('/login', login);
   fastify.get('/', getAllUsers);
+  fastify.get(`/paginated-users`,{ preHandler :[auth, isAdmin]}, paginatedUsers)
   fastify.get('/:id', getUserById);
   fastify.delete('/:id', { preHandler :[auth, isAdmin]}, deleteUser);
 

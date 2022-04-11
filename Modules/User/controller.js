@@ -74,6 +74,7 @@ const {
   getStatistics,
   holdUserAccount,
   activateUserAccount,
+  getPaginatedUsers,
 
   addUserFavorite,
   removeUserFavorite,
@@ -1126,3 +1127,53 @@ exports.activateAccount = async(request, reply) => {
   }
 
 }
+
+exports.paginatedUsers = async(request, reply) => {
+
+  try{
+
+    let filters = {}
+
+    let { offset, page, search } = request.query;
+
+    console.log('search------------>', typeof search)
+
+
+    if(search){
+
+      filters[`firstName`] = new RegExp(search.trim(), `i`);
+    
+    }
+
+    const [ startRecord, noOfRecords ] = [ parseInt(page) <= 1 ? 0 : parseInt((parseInt(page) - 1) * parseInt(offset)), parseInt(offset) <= 0 ? 1 : parseInt(offset)];
+
+    let {possibleDataDrawings, users} = await getPaginatedUsers(startRecord, noOfRecords, filters)
+
+    return reply.status(200).send({
+
+      message: 'RequestCompleted Successfully',
+      payload: {possibleDataDrawings, users},
+      hassError: false
+
+    })
+
+
+  } 
+  catch(error){
+
+    console.log('error', error)
+
+    reply.status(500).send({
+
+      message: 'internal server error occured',
+      hasError: true
+
+    })
+
+
+  }
+
+}
+
+
+
